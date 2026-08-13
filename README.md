@@ -17,6 +17,8 @@ later without touching the UI.
 - `Sources/Matiz` — the SwiftUI macOS app.
 - `Sources/matiz-tests` — assert-based checks (plain executable because XCTest and
   Swift Testing aren't available with just CommandLineTools).
+- `tools/generate_icon.swift` — draws the app icon and writes
+  `Sources/Matiz/Resources/Matiz.icns` (run with `swift tools/generate_icon.swift`).
 - `tools/generate_db.py` — regenerates `CountryLanguageDB.swift`, the embedded
   country/language data (languages from Google Translate's supported list, spoken-in
   mappings from Unicode CLDR).
