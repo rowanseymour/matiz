@@ -55,7 +55,7 @@ struct ContentView: View {
             Picker("From", selection: $model.sourceLanguage) {
                 ForEach(Catalog.languages) { Text($0.name).tag($0) }
             }
-            .fixedSize()
+            .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
 
             Button(action: model.swapLanguages) {
                 Image(systemName: "arrow.left.arrow.right")
@@ -66,14 +66,14 @@ struct ContentView: View {
             Picker("To", selection: $model.targetLanguage) {
                 ForEach(Catalog.languages) { Text($0.name).tag($0) }
             }
-            .fixedSize()
+            .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
 
             if !model.countryOptions.isEmpty {
                 Picker("Country", selection: $model.country) {
                     ForEach(model.countryOptions, id: \.self) { Text($0).tag($0) }
                     Text("Any").tag("")
                 }
-                .fixedSize()
+                .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
             }
 
             Spacer()
