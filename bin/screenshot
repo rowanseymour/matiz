@@ -1,0 +1,61 @@
+#!/bin/bash
+# Captures docs/screenshot.png for the README. Runs the app in screenshot mode, which
+# prefills the sample sentence below, sizes the window and translates on launch, so
+# the shot is one command rather than a hand-driven session. The translation is a real
+# one from the Claude Code CLI, so the variants differ a little run to run — re-run
+# this if the set it picks doesn't show the register differences well.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+SAMPLE="Could you send me the file when you get a chance?"
+
+swift build
+
+# Window names of other processes aren't visible without extra permissions, so find
+# the window by owner rather than by title.
+window_id() {
+    swift -e '
+        import AppKit
+        let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as! [[String: Any]]
+        for w in windows
+        where w[kCGWindowOwnerName as String] as? String == "Matiz" && w[kCGWindowLayer as String] as? Int == 0 {
+            print(w[kCGWindowNumber as String] as! Int)
+            break
+        }'
+}
+
+LOG="$(mktemp)"
+MATIZ_SCREENSHOT="$SAMPLE" .build/debug/Matiz >"$LOG" 2>&1 &
+APP_PID=$!
+trap 'kill "$APP_PID" 2>/dev/null || true; rm -f "$LOG"' EXIT
+
+WINDOW_ID=""
+for _ in $(seq 1 20); do
+    sleep 0.5
+    WINDOW_ID="$(window_id)"
+    [ -n "$WINDOW_ID" ] && break
+done
+if [ -z "$WINDOW_ID" ]; then
+    echo "error: window never appeared" >&2
+    exit 1
+fi
+
+# The app prints this once the variants are rendered and it has brought itself
+# forward. Translating through the CLI takes a while, so wait generously.
+for _ in $(seq 1 60); do
+    grep -q "screenshot: ready" "$LOG" && break
+    sleep 2
+done
+if ! grep -q "screenshot: ready" "$LOG"; then
+    echo "error: translation never finished" >&2
+    cat "$LOG" >&2
+    exit 1
+fi
+
+sleep 1  # let focus and rendering settle
+
+# No -o: that would drop the window shadow, and without it the window has no visible
+# edge against the white README background.
+screencapture -x -l "$WINDOW_ID" docs/screenshot.png
+
+echo "Captured docs/screenshot.png"
