@@ -34,3 +34,7 @@ The model used (Haiku by default) can be changed in Settings (⌘,).
 ```bash
 swift run matiz-tests
 ```
+
+## License
+
+[GPL-3.0](LICENSE)
