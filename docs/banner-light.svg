@@ -1,0 +1,44 @@
+<svg width="1200" height="280" viewBox="0 0 1200 280" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Matiz — translations in every shade of meaning">
+  <!-- fan-out from the source phrase to the variants -->
+  <g stroke="#d1d9e0" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M 620 140 C 690 140 710 58 780 58"/>
+    <path d="M 620 140 H 780"/>
+    <path d="M 620 140 C 690 140 710 222 780 222"/>
+  </g>
+
+  <!-- source phrase -->
+  <g fill="#6e7781">
+    <rect x="520" y="104" width="100" height="72" rx="20"/>
+    <path d="M 546 164 H 576 L 534 196 Z"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="544" y="126" width="56" height="8" rx="4"/>
+    <rect x="544" y="146" width="36" height="8" rx="4"/>
+  </g>
+
+  <!-- three variants, in tints of one hue -->
+  <g fill="#4b3fd0">
+    <rect x="780" y="26" width="340" height="64" rx="20"/>
+    <path d="M 806 78 H 836 L 784 104 Z"/>
+  </g>
+  <g fill="#6a5ae8">
+    <rect x="780" y="108" width="340" height="64" rx="20"/>
+    <path d="M 806 160 H 836 L 784 186 Z"/>
+  </g>
+  <g fill="#8b7bf0">
+    <rect x="780" y="190" width="340" height="64" rx="20"/>
+    <path d="M 806 242 H 836 L 784 268 Z"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="810" y="42" width="216" height="10" rx="5"/>
+    <rect x="810" y="64" width="140" height="10" rx="5"/>
+    <rect x="810" y="124" width="250" height="10" rx="5"/>
+    <rect x="810" y="146" width="104" height="10" rx="5"/>
+    <rect x="810" y="206" width="180" height="10" rx="5"/>
+    <rect x="810" y="228" width="164" height="10" rx="5"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="68" y="130" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="-2" fill="#1f2328">Matiz</text>
+  <text x="71" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="22" fill="#59636e">Translations in every shade of meaning</text>
+</svg>

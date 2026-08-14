@@ -1,4 +1,7 @@
-# Matiz
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/banner-dark.svg">
+  <img src="docs/banner-light.svg" alt="Matiz — translations in every shade of meaning">
+</picture>
 
 A small macOS translation app. Give it a source string, a source language, a target
 language and a country, and it returns 1–3 translation variants, each with a short
