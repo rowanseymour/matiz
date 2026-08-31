@@ -23,6 +23,14 @@ swift run Matiz
 
 The model used (Haiku by default) can be changed in Settings (⌘,).
 
+## Install
+
+```bash
+bin/install
+```
+
+Builds a release `Matiz.app` and installs it to `~/Applications`.
+
 ## Test
 
 ```bash
