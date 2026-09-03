@@ -12,6 +12,28 @@ public struct Language: Hashable, Identifiable, Sendable {
     }
 }
 
+public struct Country: Hashable, Identifiable, Sendable {
+    /// ISO 3166-1 alpha-2 code, e.g. "MX".
+    public let code: String
+    /// English name, e.g. "Mexico".
+    public let name: String
+
+    public var id: String { code }
+
+    /// Flag emoji built from the code's regional indicator symbols. A handful of
+    /// codes have no flag glyph and render as their letters instead.
+    public var flag: String {
+        String(String.UnicodeScalarView(code.unicodeScalars.compactMap {
+            Unicode.Scalar($0.value - 0x41 + 0x1F1E6)
+        }))
+    }
+
+    public init(code: String, name: String) {
+        self.code = code
+        self.name = name
+    }
+}
+
 public struct TranslationRequest: Sendable {
     public let sourceText: String
     public let sourceLanguage: Language
@@ -43,11 +65,22 @@ public struct TranslationVariant: Decodable, Hashable, Identifiable, Sendable {
 public enum Catalog {
     public static var languages: [Language] { CountryLanguageDB.languages }
 
-    /// English names of countries where the language is commonly spoken, most
-    /// speakers first. Empty for languages without a strong country association
-    /// (e.g. Esperanto, Latin).
-    public static func countries(for language: Language) -> [String] {
+    /// Countries where the language is commonly spoken, sorted by name. Empty for
+    /// languages without a strong country association (e.g. Esperanto, Latin).
+    public static func countries(for language: Language) -> [Country] {
+        countriesBySpeakers(for: language)
+            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+    }
+
+    /// The country to preselect for a language: the one with the most speakers.
+    public static func defaultCountry(for language: Language) -> Country? {
+        countriesBySpeakers(for: language).first
+    }
+
+    private static func countriesBySpeakers(for language: Language) -> [Country] {
         (CountryLanguageDB.countriesByLanguage[language.code] ?? [])
-            .compactMap { CountryLanguageDB.countryNames[$0] }
+            .compactMap { code in
+                CountryLanguageDB.countryNames[code].map { Country(code: code, name: $0) }
+            }
     }
 }
