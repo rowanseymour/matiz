@@ -5,12 +5,25 @@ import SwiftUI
 @MainActor
 @Observable
 final class TranslationViewModel {
+    private static let defaultSourceLanguage = Catalog.languages.first { $0.code == "en" }!
+    private static let defaultTargetLanguage = Catalog.languages.first { $0.code == "es" }!
+
     var sourceText = ""
-    var sourceLanguage = Catalog.languages.first { $0.code == "en" }!
-    var targetLanguage = Catalog.languages.first { $0.code == "es" }! {
-        didSet { country = Catalog.countries(for: targetLanguage).first ?? "" }
+    var sourceLanguage = TranslationViewModel.savedLanguage(forKey: "lastSourceLanguage", default: defaultSourceLanguage) {
+        didSet { UserDefaults.standard.set(sourceLanguage.code, forKey: "lastSourceLanguage") }
     }
-    var country = Catalog.countries(for: Catalog.languages.first { $0.code == "es" }!).first ?? ""
+    var targetLanguage = TranslationViewModel.savedLanguage(forKey: "lastTargetLanguage", default: defaultTargetLanguage) {
+        didSet {
+            UserDefaults.standard.set(targetLanguage.code, forKey: "lastTargetLanguage")
+            country = Catalog.countries(for: targetLanguage).first ?? ""
+        }
+    }
+    var country = TranslationViewModel.savedCountry(
+        forKey: "lastCountry",
+        language: TranslationViewModel.savedLanguage(forKey: "lastTargetLanguage", default: defaultTargetLanguage)
+    ) {
+        didSet { UserDefaults.standard.set(country, forKey: "lastCountry") }
+    }
 
     private(set) var variants: [TranslationVariant] = []
     private(set) var isTranslating = false
@@ -20,6 +33,19 @@ final class TranslationViewModel {
 
     var canTranslate: Bool {
         !sourceText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isTranslating
+    }
+
+    private static func savedLanguage(forKey key: String, default: Language) -> Language {
+        guard let code = UserDefaults.standard.string(forKey: key) else { return `default` }
+        return Catalog.languages.first { $0.code == code } ?? `default`
+    }
+
+    private static func savedCountry(forKey key: String, language: Language) -> String {
+        let options = Catalog.countries(for: language)
+        guard let saved = UserDefaults.standard.string(forKey: key), options.contains(saved) else {
+            return options.first ?? ""
+        }
+        return saved
     }
 
     func swapLanguages() {
