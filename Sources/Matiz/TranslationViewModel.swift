@@ -15,21 +15,21 @@ final class TranslationViewModel {
     var targetLanguage = TranslationViewModel.savedLanguage(forKey: "lastTargetLanguage", default: defaultTargetLanguage) {
         didSet {
             UserDefaults.standard.set(targetLanguage.code, forKey: "lastTargetLanguage")
-            country = Catalog.countries(for: targetLanguage).first ?? ""
+            country = Catalog.defaultCountry(for: targetLanguage)
         }
     }
     var country = TranslationViewModel.savedCountry(
         forKey: "lastCountry",
         language: TranslationViewModel.savedLanguage(forKey: "lastTargetLanguage", default: defaultTargetLanguage)
     ) {
-        didSet { UserDefaults.standard.set(country, forKey: "lastCountry") }
+        didSet { UserDefaults.standard.set(country?.code, forKey: "lastCountry") }
     }
 
     private(set) var variants: [TranslationVariant] = []
     private(set) var isTranslating = false
     private(set) var errorMessage: String?
 
-    var countryOptions: [String] { Catalog.countries(for: targetLanguage) }
+    var countryOptions: [Country] { Catalog.countries(for: targetLanguage) }
 
     var canTranslate: Bool {
         !sourceText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isTranslating
@@ -40,10 +40,11 @@ final class TranslationViewModel {
         return Catalog.languages.first { $0.code == code } ?? `default`
     }
 
-    private static func savedCountry(forKey key: String, language: Language) -> String {
-        let options = Catalog.countries(for: language)
-        guard let saved = UserDefaults.standard.string(forKey: key), options.contains(saved) else {
-            return options.first ?? ""
+    private static func savedCountry(forKey key: String, language: Language) -> Country? {
+        guard let code = UserDefaults.standard.string(forKey: key),
+              let saved = Catalog.countries(for: language).first(where: { $0.code == code })
+        else {
+            return Catalog.defaultCountry(for: language)
         }
         return saved
     }
@@ -60,7 +61,7 @@ final class TranslationViewModel {
             sourceText: sourceText,
             sourceLanguage: sourceLanguage,
             targetLanguage: targetLanguage,
-            country: country.isEmpty ? nil : country
+            country: country?.name
         )
         let service = ClaudeCLITranslator(model: model)
 

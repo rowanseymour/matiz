@@ -94,8 +94,9 @@ struct ContentView: View {
 
             if !model.countryOptions.isEmpty {
                 Picker("Country", selection: $model.country) {
-                    ForEach(model.countryOptions, id: \.self) { Text($0).tag($0) }
-                    Text("Any").tag("")
+                    ForEach(model.countryOptions) { country in
+                        Text("\(country.flag)  \(country.name)").tag(Country?.some(country))
+                    }
                 }
                 .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
             }

@@ -77,10 +77,16 @@ expect(Catalog.languages.contains { $0.code == "en" } && Catalog.languages.conta
        "catalog includes English and Spanish")
 expect(Catalog.languages.contains { $0.name == "Chinese (Traditional)" },
        "catalog distinguishes Traditional Chinese")
-expect(Catalog.countries(for: spanish).first == "Mexico", "Mexico first for Spanish (most speakers)")
-expect(Catalog.countries(for: spanish).contains("Ecuador"), "Ecuador listed for Spanish")
-expect(Catalog.countries(for: Language(code: "ja", name: "Japanese")) == ["Japan"],
+let spanishCountries = Catalog.countries(for: spanish)
+expect(spanishCountries.map(\.name) == spanishCountries.map(\.name).sorted { $0.localizedStandardCompare($1) == .orderedAscending },
+       "countries are listed A-Z")
+expect(spanishCountries.contains { $0.code == "EC" }, "Ecuador listed for Spanish")
+expect(Catalog.defaultCountry(for: spanish)?.name == "Mexico", "Mexico is the default for Spanish (most speakers)")
+expect(Catalog.countries(for: Language(code: "ja", name: "Japanese")).map(\.name) == ["Japan"],
        "Japan is the only country for Japanese")
+expect(Catalog.countries(for: Language(code: "eo", name: "Esperanto")).isEmpty,
+       "no countries for Esperanto")
+expect(Country(code: "MX", name: "Mexico").flag == "\u{1F1F2}\u{1F1FD}", "flag emoji built from country code")
 expect(CountryLanguageDB.languagesByCountry["CA"]?.contains("fr") == true,
        "Canada speaks French")
 
