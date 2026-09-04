@@ -3,10 +3,10 @@
   <img src="docs/banner-light.svg" alt="Matiz — translations in every shade of meaning">
 </picture>
 
-A small macOS translation app. Give it a source string, a source language, a target
-language and a country, and it returns 1–3 translation variants, each with a short
-note ("more formal", "casual, spoken", …) so you can pick the right register for the
-right place.
+A small macOS translation app for phrases and sentences, not documents. Give it a
+short piece of text, a source language, a target language and a country, and it
+returns 1–3 translation variants, each with a short note ("more formal", "casual,
+spoken", …) so you can pick the right register for the right place.
 
 <p align="center">
   <img src="docs/screenshot.png" width="700" alt="Matiz translating an English sentence into three Spanish variants">

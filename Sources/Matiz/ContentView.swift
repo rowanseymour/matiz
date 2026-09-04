@@ -10,12 +10,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             languageBar
 
-            TextEditor(text: $model.sourceText)
-                .font(.system(.body))
-                .frame(minHeight: 100, maxHeight: 160)
-                .padding(6)
-                .background(RoundedRectangle(cornerRadius: 8).fill(Color(nsColor: .textBackgroundColor)))
-                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary))
+            sourceEditor
 
             HStack {
                 Button(action: { model.translate(model: claudeModel) }) {
@@ -29,6 +24,11 @@ struct ContentView: View {
                         .controlSize(.small)
                 }
                 Spacer()
+
+                Text("\(model.sourceText.count)/\(TranslationRequest.maxSourceLength)")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(model.remainingCharacters == 0 ? .red : .secondary)
             }
 
             if let errorMessage = model.errorMessage {
@@ -74,12 +74,32 @@ struct ContentView: View {
         fflush(stdout)
     }
 
-    private var languageBar: some View {
-        HStack(spacing: 8) {
-            Picker("From", selection: $model.sourceLanguage) {
-                ForEach(Catalog.languages) { Text($0.name).tag($0) }
+    /// Deliberately small: two lines and a hard character cap, so it reads as a place
+    /// for a phrase or sentence rather than a document.
+    private var sourceEditor: some View {
+        TextEditor(text: $model.sourceText)
+            .font(.system(.body))
+            .frame(height: 40)
+            .padding(6)
+            .background(RoundedRectangle(cornerRadius: 8).fill(Color(nsColor: .textBackgroundColor)))
+            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary))
+            .overlay(alignment: .topLeading) {
+                if model.sourceText.isEmpty {
+                    Text("Phrase or sentence to translate")
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 11)
+                        .padding(.vertical, 6)
+                        .allowsHitTesting(false)
+                }
             }
-            .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
+    }
+
+    /// From ⇄ To @ Country, kept tight: the labels sit outside the pickers so the
+    /// pickers' frames don't pad out the gaps between them.
+    private var languageBar: some View {
+        HStack(spacing: 6) {
+            Text("From")
+            languagePicker(selection: $model.sourceLanguage)
 
             Button(action: model.swapLanguages) {
                 Image(systemName: "arrow.left.arrow.right")
@@ -87,22 +107,32 @@ struct ContentView: View {
             .buttonStyle(.borderless)
             .help("Swap languages")
 
-            Picker("To", selection: $model.targetLanguage) {
-                ForEach(Catalog.languages) { Text($0.name).tag($0) }
-            }
-            .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
+            Text("To")
+            languagePicker(selection: $model.targetLanguage)
 
             if !model.countryOptions.isEmpty {
+                Text("@")
+                    .foregroundStyle(.secondary)
+                    .help("Country")
                 Picker("Country", selection: $model.country) {
                     ForEach(model.countryOptions) { country in
                         Text("\(country.flag)  \(country.name)").tag(Country?.some(country))
                     }
                 }
-                .frame(minWidth: 150, maxWidth: 240, alignment: .leading)
+                .labelsHidden()
+                .frame(minWidth: 100, maxWidth: 160)
             }
 
             Spacer()
         }
+    }
+
+    private func languagePicker(selection: Binding<Language>) -> some View {
+        Picker("Language", selection: selection) {
+            ForEach(Catalog.languages) { Text($0.name).tag($0) }
+        }
+        .labelsHidden()
+        .frame(minWidth: 100, maxWidth: 160)
     }
 }
 

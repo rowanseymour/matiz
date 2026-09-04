@@ -24,6 +24,18 @@ func expectThrows(_ label: String, _ body: () throws -> Void) {
     }
 }
 
+// TranslationRequest.clampSource
+
+do {
+    let short = "Could you send me the file?"
+    expect(TranslationRequest.clampSource(short) == short, "short source text is left alone")
+    let long = String(repeating: "a", count: TranslationRequest.maxSourceLength + 50)
+    expect(TranslationRequest.clampSource(long).count == TranslationRequest.maxSourceLength,
+           "long source text is trimmed to the limit")
+    let exact = String(repeating: "é", count: TranslationRequest.maxSourceLength)
+    expect(TranslationRequest.clampSource(exact) == exact, "text at the limit is left alone")
+}
+
 // VariantParser
 
 do {
