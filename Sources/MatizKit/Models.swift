@@ -35,6 +35,15 @@ public struct Country: Hashable, Identifiable, Sendable {
 }
 
 public struct TranslationRequest: Sendable {
+    /// Matiz translates phrases and sentences, not documents, so source text is kept
+    /// short enough for that: roughly a couple of sentences.
+    public static let maxSourceLength = 200
+
+    /// Trims `text` to `maxSourceLength` characters, or returns it as-is if it fits.
+    public static func clampSource(_ text: String) -> String {
+        text.count > maxSourceLength ? String(text.prefix(maxSourceLength)) : text
+    }
+
     public let sourceText: String
     public let sourceLanguage: Language
     public let targetLanguage: Language

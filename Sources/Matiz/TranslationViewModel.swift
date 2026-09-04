@@ -8,7 +8,12 @@ final class TranslationViewModel {
     private static let defaultSourceLanguage = Catalog.languages.first { $0.code == "en" }!
     private static let defaultTargetLanguage = Catalog.languages.first { $0.code == "es" }!
 
-    var sourceText = ""
+    var sourceText = "" {
+        didSet {
+            let clamped = TranslationRequest.clampSource(sourceText)
+            if clamped != sourceText { sourceText = clamped }
+        }
+    }
     var sourceLanguage = TranslationViewModel.savedLanguage(forKey: "lastSourceLanguage", default: defaultSourceLanguage) {
         didSet { UserDefaults.standard.set(sourceLanguage.code, forKey: "lastSourceLanguage") }
     }
@@ -30,6 +35,8 @@ final class TranslationViewModel {
     private(set) var errorMessage: String?
 
     var countryOptions: [Country] { Catalog.countries(for: targetLanguage) }
+
+    var remainingCharacters: Int { TranslationRequest.maxSourceLength - sourceText.count }
 
     var canTranslate: Bool {
         !sourceText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isTranslating
