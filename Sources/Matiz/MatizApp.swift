@@ -22,8 +22,13 @@ struct MatizApp: App {
     var body: some Scene {
         WindowGroup("Matiz") {
             ContentView()
-                .frame(minWidth: 560, minHeight: 480)
         }
+        // The window can't shrink below its content, and the content's only fixed
+        // width is the language bar, so that bar sets the minimum width. The default
+        // size is deliberately smaller than that minimum so a new window opens at
+        // exactly the bar's width rather than some guessed number.
+        .windowResizability(.contentSize)
+        .defaultSize(width: 300, height: 420)
 
         Settings {
             SettingsView()
