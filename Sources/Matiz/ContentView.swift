@@ -48,27 +48,27 @@ struct ContentView: View {
             Spacer(minLength: 0)
         }
         .padding()
+        .frame(minHeight: 380)
         .task { await runScreenshotMode() }
     }
 
     /// Drives the README screenshot for `bin/screenshot`: prefills the sample text the
-    /// script passes in, sizes the window so the capture is the same shape every time,
-    /// and translates on launch. Once the variants are on screen it brings the app
+    /// script passes in, centers the window (at its default size, so the shot shows
+    /// what a new window looks like) and translates on launch. Once the variants are on screen it brings the app
     /// forward — an inactive window is captured with a grey title bar and a flatter
     /// shadow — and says so on stdout, which is the script's cue to capture.
     private func runScreenshotMode() async {
         guard let sample = ProcessInfo.processInfo.environment["MATIZ_SCREENSHOT"] else { return }
 
-        if let window = NSApp.windows.first {
-            window.setContentSize(NSSize(width: 820, height: 560))
-            window.center()
-        }
+        NSApp.appearance = NSAppearance(named: .aqua)  // same look whatever time of day it's run
+        NSApp.windows.first?.center()
         model.sourceText = sample
         model.translate(model: claudeModel)
 
         while model.isTranslating {
             try? await Task.sleep(for: .milliseconds(200))
         }
+        NSApp.windows.first?.makeFirstResponder(nil)  // no caret in the shot
         NSApp.activate(ignoringOtherApps: true)
         print("screenshot: ready")
         fflush(stdout)
@@ -95,7 +95,9 @@ struct ContentView: View {
     }
 
     /// From ⇄ To @ Country, kept tight: the labels sit outside the pickers so the
-    /// pickers' frames don't pad out the gaps between them.
+    /// pickers' frames don't pad out the gaps between them. The bar is fixed at its
+    /// natural width so the labels can't be squeezed out, and so the window (which
+    /// sizes to its content) can't be narrower than this row.
     private var languageBar: some View {
         HStack(spacing: 6) {
             Text("From")
@@ -120,11 +122,10 @@ struct ContentView: View {
                     }
                 }
                 .labelsHidden()
-                .frame(minWidth: 100, maxWidth: 160)
+                .frame(width: 150)
             }
-
-            Spacer()
         }
+        .fixedSize()
     }
 
     private func languagePicker(selection: Binding<Language>) -> some View {
@@ -132,7 +133,7 @@ struct ContentView: View {
             ForEach(Catalog.languages) { Text($0.name).tag($0) }
         }
         .labelsHidden()
-        .frame(minWidth: 100, maxWidth: 160)
+        .frame(width: 150)
     }
 }
 
